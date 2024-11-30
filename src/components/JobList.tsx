@@ -1,6 +1,7 @@
 import JobListItem from "./JobListItem";
 import { JobItem } from "../lib/types";
 import Spinner from "./Spinner";
+import { useActiveId } from "../lib/hooks";
 
 type JobListProps = {
   jobItems: JobItem[];
@@ -8,12 +9,18 @@ type JobListProps = {
 };
 
 export function JobList({ jobItems, isLoading }: JobListProps) {
+  const activeId = useActiveId();
+
   return (
     <ul className="job-list">
       {isLoading && <Spinner />}
       {!isLoading &&
         jobItems.map((jobItem) => (
-          <JobListItem key={jobItem.id} jobItem={jobItem} />
+          <JobListItem
+            key={jobItem.id}
+            jobItem={jobItem}
+            isActive={jobItem.id === activeId}
+          />
         ))}
     </ul>
   );
