@@ -58,5 +58,5 @@ export function useJobItems(searchText: string) {
     fetchData();
   }, [searchText]);
 
-  return [jobItemsCurrentPage, isLoading, totalNumberOfResults] as const;
+  return { jobItemsCurrentPage, isLoading, totalNumberOfResults } as const;
 }
