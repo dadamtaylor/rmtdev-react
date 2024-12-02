@@ -19,8 +19,9 @@ function App() {
   const debouncedSearchText = useDebounce(searchText, 400);
   const { jobItems, isLoading } = useJobItems(debouncedSearchText);
 
-  const totalNumberOfResults = jobItems.length;
-  const jobItemsCurrentPage = jobItems.slice(0, 7);
+  const totalNumberOfResults = jobItems ? jobItems.length : 0;
+  const jobItemsCurrentPage = jobItems ? jobItems.slice(0, 7) : [];
+
   return (
     <>
       <Background />

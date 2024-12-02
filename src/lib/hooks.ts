@@ -8,6 +8,12 @@ type JobItemApiResponse = {
   jobItem: JobItemDetails;
 };
 
+type JobItemsApiResponse = {
+  public: boolean;
+  sorted: boolean;
+  jobItems: JobItem[];
+};
+
 const fetchJobItem = async (activeId: number): Promise<JobItemApiResponse> => {
   const response = await fetch(`${BASE_API_URL}/${activeId}`);
   if (!response.ok) {
@@ -32,31 +38,38 @@ export function useJobItem(activeId: number | null) {
       },
     }
   );
-  const jobItem = data?.jobItem;
-  const isLoading = isInitialLoading;
-  return { jobItem, isLoading } as const;
+
+  return { jobItem: data?.jobItem, isLoading: isInitialLoading } as const;
 }
 
-export function useJobItems(searchText: string) {
-  const [jobItems, setJobItems] = useState<JobItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+const fetchJobItems = async (
+  searchText: string
+): Promise<JobItemsApiResponse> => {
+  const response = await fetch(`${BASE_API_URL}?search=${searchText}`);
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.description);
+  }
+  const data = await response.json();
+  return data;
+};
 
-  const totalNumberOfResults = jobItems.length;
-  const jobItemsCurrentPage = jobItems.slice(0, 7);
-
-  useEffect(() => {
-    if (!searchText) return;
-
-    const fetchData = async () => {
-      setIsLoading(true);
-      const response = await fetch(`${BASE_API_URL}?search=${searchText}`);
-      const data = await response.json();
-      setIsLoading(false);
-      setJobItems(data.jobItems);
-    };
-    fetchData();
-  }, [searchText]);
-
+export function useJobItems(searchText: string | null) {
+  const { data, isInitialLoading } = useQuery(
+    ["job-items", searchText],
+    () => (searchText ? fetchJobItems(searchText) : null),
+    {
+      staleTime: 1000 * 60 * 60,
+      refetchOnWindowFocus: false,
+      retry: false,
+      enabled: Boolean(searchText),
+      onError: (error) => {
+        console.log(error);
+      },
+    }
+  );
+  const jobItems = data?.jobItems;
+  const isLoading = isInitialLoading;
   return { jobItems, isLoading } as const;
 }
 
