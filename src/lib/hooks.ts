@@ -57,7 +57,7 @@ export function useJobItems(searchText: string) {
     fetchData();
   }, [searchText]);
 
-  return { jobItemsCurrentPage, isLoading, totalNumberOfResults } as const;
+  return { jobItems, isLoading } as const;
 }
 
 export function useDebounce<T>(value: T, delay = 1000): T {
