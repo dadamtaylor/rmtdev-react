@@ -10,6 +10,10 @@ type JobItemApiResponse = {
 
 const fetchJobItem = async (activeId: number): Promise<JobItemApiResponse> => {
   const response = await fetch(`${BASE_API_URL}/${activeId}`);
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.description);
+  }
   const data = await response.json();
   return data;
 };
@@ -23,7 +27,9 @@ export function useJobItem(activeId: number | null) {
       refetchOnWindowFocus: false,
       retry: false,
       enabled: Boolean(activeId),
-      onError: () => {},
+      onError: (error) => {
+        console.log(error);
+      },
     }
   );
   const jobItem = data?.jobItem;
