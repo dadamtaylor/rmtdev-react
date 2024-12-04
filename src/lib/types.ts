@@ -18,3 +18,5 @@ export type JobItemDetails = JobItem & {
   coverImgURL: string;
   companyURL: string;
 };
+
+export type TSortBy = "relevant" | "recent";
