@@ -15,7 +15,7 @@ import PaginationControls from "./PaginationControls";
 import { useDebounce, useJobItems } from "../lib/hooks";
 import { Toaster } from "react-hot-toast";
 import { RESULTS_PER_PAGE } from "../lib/constants";
-import { TSortBy } from "../lib/types";
+import { PageDirection, TSortBy } from "../lib/types";
 
 function App() {
   const [searchText, setSearchText] = useState("");
@@ -42,7 +42,7 @@ function App() {
     setCurrentPage(1);
     setSearchText(searchText);
   };
-  const handleChangePage = (direction: "next" | "back") => {
+  const handleChangePage = (direction: PageDirection) => {
     if (direction === "next") {
       setCurrentPage((prev) => prev + 1);
     } else if (direction === "back") {
