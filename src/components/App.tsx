@@ -24,13 +24,13 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<TSortBy>("relevant");
 
-  const jobItemsSorted =
-    jobItems?.sort((a, b) => {
-      if (sortBy === "relevant") {
-        return b.relevanceScore - a.relevanceScore;
-      }
-      return a.daysAgo - b.daysAgo;
-    }) || [];
+  // Don't mutate the jobItems array, sort into a new array
+  const jobItemsSorted = [...(jobItems || [])].sort((a, b) => {
+    if (sortBy === "relevant") {
+      return b.relevanceScore - a.relevanceScore;
+    }
+    return a.daysAgo - b.daysAgo;
+  });
   const totalNumberOfResults = jobItems ? jobItems.length : 0;
   const totalNumberOfPages = Math.ceil(totalNumberOfResults / RESULTS_PER_PAGE);
   const jobItemsCurrentPage = jobItemsSorted.slice(
