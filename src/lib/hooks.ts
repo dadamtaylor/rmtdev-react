@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { JobItem, JobItemDetails } from "./types";
 import { BASE_API_URL } from "./constants";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { handleError } from "./utils";
 import { BookmarksContext } from "../contexts/BookmarksContextProvider";
 
@@ -42,6 +42,29 @@ export function useJobItem(activeId: number | null) {
   return { jobItem: data?.jobItem, isLoading: isInitialLoading } as const;
 }
 
+export function useJobItems(ids: number[]) {
+  const results = useQueries({
+    queries: ids.map((id) => ({
+      queryKey: ["job-item", id],
+      queryFn: () => fetchJobItem(id),
+      staleTime: 1000 * 60 * 60,
+      refetchOnWindowFocus: false,
+      retry: false,
+      enabled: Boolean(id),
+      onError: handleError,
+    })),
+  });
+
+  // Cast results carefully.  TS doesn't pick up on correct type.
+  const jobItems = results
+    .map((result) => result.data?.jobItem)
+    .filter((jobItem) => jobItem !== undefined) as JobItemDetails[];
+  const isLoading = results.some((result) => result.isLoading);
+  return { jobItems, isLoading } as const;
+}
+
+// -----------------------------------
+
 const fetchJobItems = async (
   searchText: string
 ): Promise<JobItemsApiResponse> => {
@@ -54,7 +77,7 @@ const fetchJobItems = async (
   return data;
 };
 
-export function useJobItems(searchText: string | null) {
+export function useSearchQuery(searchText: string | null) {
   const { data, isInitialLoading } = useQuery(
     ["job-items", searchText],
     () => (searchText ? fetchJobItems(searchText) : null),
