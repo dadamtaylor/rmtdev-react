@@ -94,6 +94,8 @@ export function useSearchQuery(searchText: string | null) {
   return { jobItems, isLoading } as const;
 }
 
+// -----------------------------------
+
 export function useDebounce<T>(value: T, delay = 1000): T {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -135,6 +137,26 @@ export function useLocalStorage<T>(
   }, [value, key]);
 
   return [value, setValue] as const;
+}
+
+export function useOnClickOutside(
+  refs: React.RefObject<HTMLElement>[],
+  handler: () => void
+) {
+  // Add a root node event listener to close the popover when clicking outside
+  // the popover
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      if (refs.every((ref) => !ref.current?.contains(event.target as Node))) {
+        handler();
+      }
+    };
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [refs, handler]);
 }
 
 export function useBookmarksContext() {
